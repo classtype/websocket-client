@@ -127,13 +127,13 @@ var Socket = $.extend(
 |
 |-------------------------------------------------------------------------------------------------*/
 
-    {public: {emit: function(event, success) {
+    {public: {emit: function(event, args) {
     // Проверяем наличие события
         if (this.events[event]) {
         // Проходим по списку обработчиков события
             for (var i = 0; i < this.events[event].length; i++) {
             // Запускаем обработчик
-                this.events[event][i].call(this, success);
+                this.events[event][i].apply(this, args);
             }
         }
     }}},
@@ -156,8 +156,11 @@ var Socket = $.extend(
         
     // Добавляем callback для отправки запроса на авторизацию
         this.onAccess = function() {
+        // Добавляем элемент в начало массива
+            args.unshift('Access');
+            
         // Отправляем запрос на авторизацию
-            this.send('Access', {args:args});
+            this.send.apply(this, args);
         };
     }}},
     
@@ -167,7 +170,7 @@ var Socket = $.extend(
 |
 |-------------------------------------------------------------------------------------------------*/
 
-    {public: {setInit: function(msg) {
+    {public: {setInit: function(args) {
     // Добавляем обработчик завершения инициализации
         this.on('Init', function(success) {
         // Запускаем обработчик полной загрузки
@@ -179,8 +182,11 @@ var Socket = $.extend(
         
     // Добавляем callback для отправки запроса на инициализацию
         this.onInit = function() {
+        // Добавляем элемент в начало массива
+            args.unshift('Init');
+            
         // Отправляем запрос на инициализацию
-            this.send('Init', msg);
+            this.send.apply(this, args);
         };
     }}},
     
@@ -280,7 +286,7 @@ var Socket = $.extend(
             if (t.onAccess && status == 'Connect') return;
             
         // Запускаем обработчик полной загрузки
-            p.onload.call(t, success);
+            p.onload.apply(t, success);
         };
         
     // Проверка поддержки браузером
@@ -332,15 +338,21 @@ var Socket = $.extend(
 |
 |-------------------------------------------------------------------------------------------------*/
 
-    {public: {send: function(header, body) {
+    {public: {send: function() {
     // Создаем запрос
         var r = [];
         
-    // Заголовок
-        r.push(header);
+    // Переводим аргументы в массив
+        var args = Array.prototype.slice.call(arguments, 0);
         
-    // Тело запроса (по умолчанию пустой объект)
-        r.push(typeof(body) == 'object' ? body : {});
+    // Удаляем первый элемент
+        args.shift();
+        
+    // Добавляем заголовок
+        r.push(arguments[0]);
+        
+    // Добавляем тело запроса (по умолчанию пустой массив)
+        r.push(args);
         
     // Конвертируем в JSON
         var json = JSON.stringify(r);
@@ -349,7 +361,7 @@ var Socket = $.extend(
         this.socket.send(json);
         
     // Записываем в консоль
-        this.console['<-'](header, (this.isConsole == 'body' ? JSON.stringify(r[1]) : json));
+        this.console['<-'](arguments[0], (this.isConsole == 'body' ? JSON.stringify(r[1]) : json));
     }}}
 );
 
