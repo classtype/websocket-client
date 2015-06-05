@@ -41,7 +41,7 @@ var Socket = $.extend(
     // Console
         t.console = function(message) {
             if (t.isConsole) {
-                t.div.innerHTML += '<div style="color:#FFFFFF">' + message + '</div>';
+                t.div.innerHTML += '<div style="color:#FFFFFF">' + (typeof message == 'string' ? message : JSON.stringify(message)) + '</div>';
                 t.div.scrollTop = t.div.scrollHeight;
             }
         };
