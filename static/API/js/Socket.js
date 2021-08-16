@@ -146,9 +146,9 @@ var Socket = $.extend(
 
     {public: {setAccess: function(args) {
     // Добавляем обработчик успешной авторизации
-        this.on('Access', function(success) {
+        this.on('Access', function() {
         // Запускаем обработчик полной загрузки
-            this.onload('Access', success);
+            this.onload('Access', arguments);
             
         // Переходим к инициализации
             this.change('Init');
@@ -172,9 +172,9 @@ var Socket = $.extend(
 
     {public: {setInit: function(args) {
     // Добавляем обработчик завершения инициализации
-        this.on('Init', function(success) {
+        this.on('Init', function() {
         // Запускаем обработчик полной загрузки
-            this.onload('Init', success);
+            this.onload('Init', arguments);
             
         // Переходим к завершению инициализации
             this.change('Complete');
@@ -275,7 +275,7 @@ var Socket = $.extend(
         t.setError();
         
     // Добавляем обработчик полной загрузки
-        t.onload = function(status, success) {
+        t.onload = function(status, args) {
         // Не задан обработчик полной загрузки
             if (!p.onload) return;
             
@@ -286,7 +286,7 @@ var Socket = $.extend(
             if (t.onAccess && status == 'Connect') return;
             
         // Запускаем обработчик полной загрузки
-            p.onload.apply(t, success);
+            p.onload.apply(t, args);
         };
         
     // Проверка поддержки браузером
