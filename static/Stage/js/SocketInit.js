@@ -52,7 +52,7 @@ Onloader.on(function() {
         console: 'body',
         
     // Адрес сервера
-        host: 'wss://websocket-server-classtype.c9.io',
+        host: 'ws:/192.168.1.2:8081',
         
     // Реквизиты для авторизации
         access: ['701111', 'my_password'],
